@@ -15,6 +15,37 @@ require_once 'vendor/autoload.php';
 
 
 
+// create required pages on activation and insert the appropriate shortcode
+function ptslack_plugin_activate() {
+    $channel_list_page = wp_insert_post(array(
+        'post_content' => '[ptslack_channels]',
+        'post_title'   => 'Slack Channels',
+        'post_type'    => 'page',
+        'post_status'  => 'publish'
+    ), true, true);
+
+    if ( is_wp_error( $channel_list_page ) ) {
+        return "<strong>" . __("Something went wrong", 'ptslack') . "</strong>";
+    }
+        
+}
+register_activation_hook( __FILE__, 'ptslack_plugin_activate' );
+
+
+
+// delete pages on deactivation
+function ptslack_plugin_deactivate() {
+    $channel_list_page = get_page_by_title( 'Slack Channels' );
+
+    if ( $channel_list_page ) {
+        wp_delete_post( $channel_list_page->ID, true );
+    }
+        
+}
+register_deactivation_hook( __FILE__, 'ptslack_plugin_deactivate' );
+
+
+
 function ptslack_channels_func( $atts , $slack=null ) {
     $slack = ( $slack ) ? $slack : new wrapi\slack\slack(get_option("slack_token"));
 
