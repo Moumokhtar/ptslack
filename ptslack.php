@@ -52,6 +52,11 @@ function ptslack_channels_func( $atts , $slack=null ) {
     $channels = $slack->conversations->list(array("exclude_archived" => 1));
 
     if  ( !$channels['ok'] ) {
+
+        if ( isset($channels['error']) && $channels['error'] === 'not_authed' ) {
+            return "<strong>" . __("Please insert you slack app access token in the plugin settings page", 'ptslack') . "</strong>";
+        }
+        
         return "<strong>" . __("Something went wrong", 'ptslack') . "</strong>";
     }
 
